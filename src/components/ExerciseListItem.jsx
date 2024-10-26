@@ -6,7 +6,10 @@ export default function ExerciseListItem( {item} ) {
       <Link href = {`/${item.name}`} asChild>
         <Pressable style = {styles.exerciseContainer}>
           <Text style = {styles.exerciseName}> {item.name} </Text>
-          <Text style = {styles.exerciseSubtitle}> {item.muscle.toUpperCase()} | {item.equipment.toUpperCase()} </Text>
+
+          <Text style={styles.exerciseSubtitle}>
+            <Text style={styles.subValue}>{item.muscle} | {item.equipment}</Text>
+          </Text>
         </Pressable>
       </Link>
     );
@@ -36,5 +39,8 @@ const styles = StyleSheet.create({
     },
     exerciseSubtitle: {
       color: 'dimgray'
-    }
+    },
+    subValue: {
+      textTransform: 'capitalize',
+    },
 });

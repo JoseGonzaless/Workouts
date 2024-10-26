@@ -1,19 +1,43 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { ActivityIndicator, View, Text, StyleSheet, ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import exercises from '../../assets/data/exercises.json';
 import { Stack } from 'expo-router';
 import { useState } from 'react';
+import { useQuery } from "@tanstack/react-query";
+import { gql } from "graphql-request";
+import client from "../graphqlClient";
+
+const exerciseQuery = gql`
+    query exercises($name: String) {
+        exercises(name: $name) {
+            name
+            equipment
+            instructions
+            muscle
+        }
+    }
+`;
 
 export default function ExerciseDetailsScreen() {
-    const params = useLocalSearchParams();
-    const exercise = exercises.find((item) => item.name == params.name);
+    const {name} = useLocalSearchParams();
     const [isInstructionExpanded, setIsInstructionExpanded] = useState(false);
 
-    if (!exercise) {
+    const { data, isLoading, error } = useQuery({
+        queryKey: ['exercises', name],
+        queryFn: () => client.request(exerciseQuery, {name}),
+    });
+
+    if (isLoading) {
+        return <ActivityIndicator/>
+    }
+
+    if (error) {
         return (
             <Text>Exercise Not Found</Text>
         )
     }
+
+    const exercise = data.exercises[0];
 
     return (
         <ScrollView contentContainerStyle = {styles.container}>
@@ -21,7 +45,9 @@ export default function ExerciseDetailsScreen() {
 
             <View style = {styles.panel}>
                 <Text style = {styles.exerciseName}> {exercise.name} </Text>
-                <Text style = {styles.exerciseSubtitle}> {exercise.muscle.toUpperCase()} | {exercise.equipment.toUpperCase()} </Text>
+                <Text style = {styles.exerciseSubtitle}> 
+                    <Text style = {styles.subValue}> {exercise.muscle} | {exercise.equipment} </Text>
+                </Text>
             </View>
 
             <View style = {styles.panel}>
@@ -62,6 +88,9 @@ const styles = StyleSheet.create({
         padding: 10,
         fontweight: '600',
         color: 'gray'
-    }
+    },
+    subValue: {
+        textTransform: 'capitalize',
+      },
 
 });
