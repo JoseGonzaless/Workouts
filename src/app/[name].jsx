@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useQuery } from "@tanstack/react-query";
 import { gql } from "graphql-request";
 import client from "../graphqlClient";
+import NewSetInput from "../components/NewSetInput";
 
 const exerciseQuery = gql`
     query exercises($name: String) {
@@ -52,12 +53,14 @@ export default function ExerciseDetailsScreen() {
 
             <View style = {styles.panel}>
                 <Text style = {styles.instructions} numberOfLines = {isInstructionExpanded ? 0 : 3}> {exercise.instructions} </Text>
+
+                <Text 
+                    onPress = {() => setIsInstructionExpanded(!isInstructionExpanded)} 
+                    style = {styles.viewMore}> {isInstructionExpanded ? 'View less' : 'View more'} 
+                </Text>
             </View>
 
-            <Text 
-                onPress = {() => setIsInstructionExpanded(!isInstructionExpanded)} 
-                style = {styles.viewMore}> {isInstructionExpanded ? 'View less' : 'View more'} 
-            </Text>
+            <NewSetInput></NewSetInput>
         </ScrollView>
     )
 };
